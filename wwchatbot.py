@@ -41,12 +41,16 @@ def rule_based_response(query):
 # --- LOAD AND INDEX PDF ---
 @st.cache_resource
 def load_pdf_qa():
-    import os
     from langchain_community.vectorstores import FAISS
     from langchain_openai import OpenAIEmbeddings
     from langchain.schema import Document
+    import os
 
-    # Load and split PDF text
+    # If FAISS index already saved, load it
+    if os.path.exists("faiss_index/index.faiss"):
+        return FAISS.load_local("faiss_index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+
+    # Only embed ONCE (first run)
     with pdfplumber.open("compatibility.pdf") as pdf:
         text = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
     documents = [Document(page_content=text)]
@@ -54,13 +58,10 @@ def load_pdf_qa():
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
     docs = splitter.split_documents(documents)
 
-    # Check if FAISS index already exists
-    if os.path.exists("faiss_index"):
-        return FAISS.load_local("faiss_index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
-    else:
-        vectordb = FAISS.from_documents(docs, OpenAIEmbeddings())
-        vectordb.save_local("faiss_index")
-        return vectordb.as_retriever()
+    vectordb = FAISS.from_documents(docs, OpenAIEmbeddings())
+    vectordb.save_local("faiss_index")
+    return vectordb
+
 
 
 qa_chain = RetrievalQA.from_chain_type(
