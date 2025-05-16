@@ -1,4 +1,5 @@
 streamlit
+langchain
 llama-index
 openai
 pymupdf
