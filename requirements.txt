@@ -6,3 +6,5 @@ pdfplumber
 tiktoken
 python-dotenv
 faiss-cpu
+unstructured
+pdfminer.six
