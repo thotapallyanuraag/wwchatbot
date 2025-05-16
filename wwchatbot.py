@@ -36,9 +36,21 @@ def rule_based_response(query):
 # --- LOAD FAISS INDEX ONLY (NO EMBEDDING) ---
 @st.cache_resource
 def load_pdf_qa():
-    if not os.path.exists("faiss_index/index.faiss"):
-        raise FileNotFoundError("FAISS index not found. Please upload the faiss_index folder to your repo.")
-    return FAISS.load_local("faiss_index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+    from langchain.schema import Document
+    from langchain_community.vectorstores import FAISS
+    from langchain_openai import OpenAIEmbeddings
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+    with open("compatibility_text.txt", "r", encoding="utf-8") as f:
+        text = f.read()
+
+    documents = [Document(page_content=text)]
+    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
+    docs = splitter.split_documents(documents)
+
+    vectordb = FAISS.from_documents(docs, OpenAIEmbeddings())
+    return vectordb.as_retriever()
+
 
 # --- INIT QA CHAIN ---
 qa_chain = RetrievalQA.from_chain_type(
