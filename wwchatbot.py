@@ -41,24 +41,34 @@ def rule_based_response(query):
 # --- LOAD AND INDEX PDF ---
 @st.cache_resource
 def load_pdf_qa():
+    import os
+    from langchain_community.vectorstores import FAISS
+    from langchain_openai import OpenAIEmbeddings
+    from langchain.schema import Document
+
+    # Load and split PDF text
     with pdfplumber.open("compatibility.pdf") as pdf:
         text = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
-
-    from langchain.schema import Document
     documents = [Document(page_content=text)]
 
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
     docs = splitter.split_documents(documents)
 
-    vectordb = FAISS.from_documents(docs, OpenAIEmbeddings())
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
-        chain_type="stuff",
-        retriever=vectordb.as_retriever()
-    )
-    return qa_chain
+    # Check if FAISS index already exists
+    if os.path.exists("faiss_index"):
+        return FAISS.load_local("faiss_index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+    else:
+        vectordb = FAISS.from_documents(docs, OpenAIEmbeddings())
+        vectordb.save_local("faiss_index")
+        return vectordb.as_retriever()
 
-qa_chain = load_pdf_qa()
+
+qa_chain = RetrievalQA.from_chain_type(
+    llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
+    chain_type="stuff",
+    retriever=load_pdf_qa()
+)
+
 
 # --- CHAT HANDLER ---
 user_input = st.chat_input("Ask anything about AMPERIX®, tariffs, or compatibility...")
