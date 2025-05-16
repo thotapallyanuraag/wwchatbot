@@ -3,5 +3,4 @@ langchain
 openai
 pdfplumber
 tiktoken
-python-dotenv
 faiss-cpu
