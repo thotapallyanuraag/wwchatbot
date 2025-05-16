@@ -5,6 +5,8 @@ from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
+from langchain.document_loaders import TextLoader
+import pdfplumber
 import os
 
 # --- PAGE SETUP ---
@@ -50,7 +52,15 @@ def rule_based_response(query):
 # --- LOAD PDF & INDEX ONCE ---
 @st.cache_resource
 def load_pdf_qa():
-    loader = UnstructuredPDFLoader("compatibility.pdf")
+    with pdfplumber.open("compatibility.pdf") as pdf:
+        text = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
+
+    # Save extracted text to temp file
+    with open("compatibility.txt", "w") as f:
+        f.write(text)
+
+    # Use TextLoader to index it
+    loader = TextLoader("compatibility.txt")
     pages = loader.load()
 
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
