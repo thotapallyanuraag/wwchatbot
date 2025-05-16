@@ -1,11 +1,12 @@
 import streamlit as st
 import pdfplumber
-from langchain.document_loaders import TextLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
+from langchain.schema import Document
+
 import os
 
 st.set_page_config(page_title="Wendeware Chatbot", layout="centered")
