@@ -42,13 +42,14 @@ def rule_based_response(query):
 def load_pdf_qa():
     with pdfplumber.open("compatibility.pdf") as pdf:
         text = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
-    with open("compatibility.txt", "w") as f:
-        f.write(text)
-    loader = TextLoader("compatibility.txt")
-    docs = loader.load()
+
+    from langchain.schema import Document
+    documents = [Document(page_content=text)]
+
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
-    split_docs = splitter.split_documents(docs)
-    vectordb = FAISS.from_documents(split_docs, OpenAIEmbeddings())
+    docs = splitter.split_documents(documents)
+
+    vectordb = FAISS.from_documents(docs, OpenAIEmbeddings())
     qa_chain = RetrievalQA.from_chain_type(
         llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
         chain_type="stuff",
