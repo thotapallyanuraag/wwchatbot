@@ -1,10 +1,8 @@
 streamlit
 langchain
 openai
-pymupdf
-pdfplumber
 tiktoken
-python-dotenv
-faiss-cpu
 unstructured
 pdfminer.six
+faiss-cpu
+python-dotenv
