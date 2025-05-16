@@ -1,7 +1,8 @@
 streamlit
 langchain
-llama-index
 openai
 pymupdf
+pdfplumber
 tiktoken
 python-dotenv
+faiss-cpu
