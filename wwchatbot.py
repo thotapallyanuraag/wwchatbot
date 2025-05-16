@@ -1,12 +1,7 @@
 import streamlit as st
-import pdfplumber
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
-from langchain_openai import ChatOpenAI
-from langchain.schema import Document
-
 import os
 
 st.set_page_config(page_title="Wendeware Chatbot", layout="centered")
@@ -38,38 +33,19 @@ def rule_based_response(query):
         return "Wendeware AG is a German company focusing on energy automation."
     return None
 
-# --- LOAD AND INDEX PDF ---
+# --- LOAD FAISS INDEX ONLY (NO EMBEDDING) ---
 @st.cache_resource
 def load_pdf_qa():
-    from langchain_community.vectorstores import FAISS
-    from langchain_openai import OpenAIEmbeddings
-    from langchain.schema import Document
-    import os
+    if not os.path.exists("faiss_index/index.faiss"):
+        raise FileNotFoundError("FAISS index not found. Please upload the faiss_index folder to your repo.")
+    return FAISS.load_local("faiss_index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
 
-    # If FAISS index already saved, load it
-    if os.path.exists("faiss_index/index.faiss"):
-        return FAISS.load_local("faiss_index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
-
-    # Only embed ONCE (first run)
-    with pdfplumber.open("compatibility.pdf") as pdf:
-        text = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
-    documents = [Document(page_content=text)]
-
-    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
-    docs = splitter.split_documents(documents)
-
-    vectordb = FAISS.from_documents(docs, OpenAIEmbeddings())
-    vectordb.save_local("faiss_index")
-    return vectordb
-
-
-
+# --- INIT QA CHAIN ---
 qa_chain = RetrievalQA.from_chain_type(
     llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
     chain_type="stuff",
-    retriever=load_pdf_qa()
+    retriever=load_pdf_qa().as_retriever()
 )
-
 
 # --- CHAT HANDLER ---
 user_input = st.chat_input("Ask anything about AMPERIX®, tariffs, or compatibility...")
@@ -86,6 +62,6 @@ if user_input:
     st.session_state.messages.append({"role": "assistant", "content": response})
     st.chat_message("assistant").write(response)
 
-# Display history
+# Display chat history
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
