@@ -1,0 +1,6 @@
+streamlit
+llama-index
+openai
+pymupdf
+tiktoken
+python-dotenv
