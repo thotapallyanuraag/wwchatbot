@@ -1,0 +1,637 @@
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+AMPERIX® Energiemanager 
+Kompatibilitätsliste 
+Energiesystemkomponenten 
+ 
+ 
+ 
+   
+
+ 
+ 
+Inhaltsverzeichnis 
+ 
+1.  PV-Wechselrichter ........................................................................................................................... 1 
+2.  Hybrid/Batterie-Wechselrichter ...................................................................................................... 5 
+3.  Ladestationen .................................................................................................................................. 8 
+4.  Stromzähler ................................................................................................................................... 11 
+5.  Wärme- und Kältezähler ................................................................................................................ 13 
+6.  Druckluft- und Gaszähler ............................................................................................................... 14 
+7.  Wärmepumpen .............................................................................................................................. 14 
+8.  Heizstäbe ....................................................................................................................................... 14 
+9.  Brennstoffzellen............................................................................................................................. 15 
+10.  BHKW ............................................................................................................................................. 15 
+11.  Elektrolyseure ................................................................................................................................ 15 
+12.  Externe Vorgaben .......................................................................................................................... 16 
+12.1  Rundsteuerempfänger ......................................................................................................... 16 
+12.2  Vermarkter Schnittstelle ...................................................................................................... 16 
+12.3  Dynamische Stromtarife ...................................................................................................... 16 
+ 
+Die in der Liste aufgeführten Geräte wurden von uns getestet, dennoch können Anpassungen seitens der Hersteller zu 
+Inkompatibilitäten führen. Wir bemühen uns, die Liste stets aktuell zu halten. 
+© Wendeware AG   |   Kompatibilitätsliste    |    Stand 18.12.2024    Seite II 
+
+ 
+ 
+1.  PV-Wechselrichter 
+ 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+Tripower STP 4.0, STP 5.0, STP 6.0, STP 8.0,  Ist ihr gewünschter Wechselrichter nicht aufgeführt? Ähnliche 
+STP 10.0, 5000TL-20, 6000TL-20, 7000TL-20,  Modelle sind mit höchster Wahrscheinlichkeit auch kompatibel. 
+8000TL-10, 8000TL-20, 9000TL-20, 10000TL- Dies können wir schnell prüfen. 
+Modbus/TCP  Ethernet RJ45  1.32.0 
+10, 10000TL-20, 11000TL-20, 12000TL-10, 
+12000TL-20, 15000TL-10, 15000TL-30, 
+17000TL-10, 20000TL-30, 25000TL-30 
+Sunny Boy: SB 1.5, 2.5, 3.0-1AV-41, 3.6-1AV-  
+41,4.0-1AV-41,5.0-1AV-41, 6.0-1AV-41, 
+Modbus/TCP  Ethernet RJ45  1.32.0 
+5000SE-10, 3600SE-10, 3000TL-21, 3600TL-21, 
+SMA  4000TL-21, 5000TL-21 
+Sunny Boy: SB 3.0-1AV-40, 3.6-1AV-40, 4.0-  
+Modbus/TCP  Ethernet RJ45  3.0 
+1AV-40,5.0-1AV-40 
+Tripower X (STP 12-50, STP 15-50, STP 17-50,   
+Modbus/TCP  Ethernet RJ45  1.32.0 
+STP 20-50 und STP 25-50) 
+ 
+Tripower Core 1 (STP50-40, STP50-41)  Modbus/TCP  Ethernet RJ45  1.32.0 
+ 
+Tripower Core 2 (STP110-60)  Modbus/TCP  Ethernet RJ45  1.32.0 
+SE XXXX (1-phasig)  Modbus/TCP  Ethernet RJ45  1.32.0  Auf Anfrage 
+SE XK (3-phasig)   
+SE XXK (3-phasig)  Modbus/TCP  Ethernet RJ45  1.32.0 
+solaredge  SE XXXK (3-phasig) 
+ 
+SE HD Wave / SE XXXXH  Modbus/TCP  Ethernet RJ45  1.32.0 
+SE XK-RWS (hybrid)   
+Modbus/TCP  Ethernet RJ45  1.32.0 
+SE XXK-RWS (hybrid) 
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 1 
+
+ 
+ 
+ 
+Plenticore Plus 4.2, 5.5, 7.0, 8.5, 10  Modbus/TCP  Ethernet RJ45  1.32.0 
+ 
+Piko (Old Generation)  Modbus/TCP  Ethernet RJ45  1.32.0 
+ 
+Kostal  Piko IQ 4.2, 5.5, 7.0, 8.5, 10  Modbus/TCP  Ethernet RJ45  1.32.0 
+ 
+Piko CI 10, 30, 50, 60  Modbus/TCP  Ethernet RJ45  1.32.0 
+Weitere Versionen können höchstwahrscheinlich problemlos 
+Piko 12, 15, 17, 20  Modbus/TCP  Ethernet RJ45  1.32.0 
+implementiert werden. 
+Modbus/TCP  Ethernet RJ45 
+Primo  1.32.0  Auf Anfrage 
+Modbus/TCP  Ethernet RJ45 
+Galvo  1.32.0  Auf Anfrage 
+Modbus/TCP  Ethernet RJ45   
+Fronius 
+Symo  1.32.0 
+Modbus/TCP  Ethernet RJ45  Benötigt zusätzlichen Zähler 
+Gen24  1.32.0 
+Modbus/TCP  Ethernet RJ45   
+Verto  2.0.0 
+SG10KTL / SG12KTL / SG15KTL / SG20KTL / 
+Modbus/TCP,  Ethernet RJ45, 
+SG30KTL / SG36KTL / SG40KTL / SG60KTL /  1.32.0   
+sungrow  SG80KTL /  Modbus/RTU  RS485 
+Modbus/TCP,  Ethernet RJ45, 
+SG30KU / SG36KU / SG60KU  1.32.0   
+Modbus/RTU  RS485 
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 2 
+
+ 
+ 
+SG5KTL-MT / SG6KTL-MT /SG8KTL-M / 
+SG10KTL-M / SG10KTL-MT /SG12KTL-M / 
+SG15KTL-M / SG17KTL-M / SG20KTL-M 
+Modbus/TCP,  Ethernet RJ45, 
+/SG30KTL-M / SG30KTL-M-V31 / SG33KTL-M /  1.32.0   
+Modbus/RTU  RS485 
+SG36KTL-M / SG40KTL-M / SG50KTL-M / 
+SG50KTL-M-20 / SG60KTL-M / SG80KTL-M / 
+SG80KTL-20 / 
+Modbus/TCP,  Ethernet RJ45, 
+LP_P34KSG  1.32.0   
+Modbus/RTU  RS485 
+Modbus/TCP,  Ethernet RJ45, 
+SG33K3J / SG49K5J / SG34KJ  1.32.0   
+Modbus/RTU  RS485 
+Modbus/TCP,  Ethernet RJ45, 
+SG60KU-M  1.32.0   
+Modbus/RTU  RS485 
+SG111HV / SG125HV / SG125HV-20 / 
+SG125HX / SG125HX-JP / SG200HX-US/ 
+SG285HX / SG333HX / SG350HX-US /  Modbus/TCP,  Ethernet RJ45, 
+1.32.0   
+SG320HX / SG320HX-20 / SG350HX /  Modbus/RTU  RS485 
+  SG350HX-20 / SG75CX-P2/ SG110CX-P2/ 
+SG125CX-P2 /  
+SG25CX-SA /SG30CX / SG33CX / SG36CX-US / 
+SG40CX / SG50CX / SG60CX-US / SG75CX / 
+SG100CX /  SG100CX-JP /  SG110CX / 
+Modbus/TCP,  Ethernet RJ45, 
+SG49.5CX-JP/ SG25CX-P2 / SG30CX-P2 /  1.32.0   
+Modbus/RTU  RS485 
+SG33CX-P2 / SG36CX-P2 / SG40CX-P2 / 
+SG50CX-P2 / SG15CX-P2-LV / SG20CX-P2-LV / 
+SG25CX-P2-LV 
+Modbus/TCP,  Ethernet RJ45, 
+SG250HX / SG250HX-US / SG250HX-IN /  1.32.0   
+Modbus/RTU  RS485 
+SG3.0RT / SG4.0RT / SG5.0RT / SG6.0RT / 
+SG7.0RT / SG8.0RT / SG10RT / SG12RT / 
+SG15RT / SG17RT / SG20RT / SG22RT / 
+SG23RT / SG25RT / SG3.0RT-P2 / SG4.0RT-P2  Modbus/TCP,  Ethernet RJ45, 
+1.32.0   
+/ SG5.0RT-P2 / SG6.0RT-P2 / SG7.0RT-P2 /  Modbus/RTU  RS485 
+SG8.0RT-P2 / SG10RT-P2 / SG12RT-P2 / 
+SG15RT-P2 / SG17RT-P2 / SG20RT-P2 / 
+SG23RT-P2 / SG25RT-P2 
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 3 
+
+ 
+ 
+SG5.5RS-JP / SG2.0RS-S / SG2.5RS-S / 
+SG3.0RS-S / SG3.0RS / SG3.6RS / SG4.0RS / 
+  SG5.0RS / SG6.0RS / SG8.0RS / SG9.0RS /  Modbus/TCP,  Ethernet RJ45, 
+1.32.0   
+SG10RS / SG5.0RS-ADA / SG3.0RS-L /  Modbus/RTU  RS485 
+SG4.0RS-L / SG5.0RS-L / SG6.0RS-L / SG8.0RS-
+L / SG9.0RS-L / SG10RS-L 
+Die Steuerung von Batterien mittels angeschlossenen Huawei 
+SmartLogger  Modbus/TCP  Ethernet RJ45  1.32.0 
+Hybrid-Wechselrichter wird noch nicht unterstützt. 
+Huawei 
+Die Steuerung von Batterien mittels Huawei Hybrid-Wechselrichter 
+Modbus/TCP,  Ethernet RJ45,  wird noch nicht unterstützt. Wird Modbus/RTU verwendet kann 
+PV-Wechselrichter-Modelle  2.0.0 
+Modbus/RTU  RS485  das Paritätsbit nicht eingestellt werden. Somit können nur Geräte 
+verbunden werden, welche die Parität none verwendet. 
+AE REFUsol 008K  Modbus/TCP  Ethernet RJ45  1.32.0 
+Es werden einige REFUsol Modelle unterstützt, welche mit der AE-
+Advanced Energy  AE REFUsol 010K  Modbus/TCP  Ethernet RJ45  1.32.0  Schnittstelle überarbeitet wurden. REFUsol Modelle, die nur eine 
+alte REFUsol Schnittstelle haben und keine AE-Kennung, werden 
+AE 3TL 17-IEC (Gen3)  Modbus/TCP  Ethernet RJ45  1.32.0  nicht unterstützt. 
+AE 3TL 20-IEC (Gen3)  Modbus/TCP  Ethernet RJ45  1.32.0 
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 4 
+
+ 
+ 
+2.  Hybrid/Batterie-Wechselrichter 
+ 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+Sunny Island: SI3.0M-11, SI4.4M-11, 
+SI4.4M-12, SI6.0H-11, SI6.0H-12,  Modbus/TCP  Ethernet RJ45  1.32.0   
+S18.0H-11, SI8.0H-12 
+Sunny Boy Storage: SBS 2.5, 3.7, 5.0, 
+Modbus/TCP  Ethernet RJ45  1.32.0   
+6.0 
+SMA 
+Inverter Manager  Modbus/TCP  Ethernet RJ45  1.32.0   
+Sunny Tripower Storage: STPS30, 
+Modbus/TCP  Ethernet RJ45  1.32.0  Externer Stromzähler erforderlich 
+STPS50 
+Sunny Tripower Smart Energy: 
+STP5.0SE, STP6.0SE, STP8.0SE,  Modbus/TCP  Ethernet RJ45  3.0.0   
+STP10.0SE 
+Color Control GX  Modbus/TCP  Ethernet RJ45  1.32.0   
+Venus GX  Modbus/TCP  Ethernet RJ45  1.32.0   
+victron energy 
+Cerbo GX  Modbus/TCP  Ethernet RJ45  1.32.0   
+Multiplus II GX  Modbus/TCP  Ethernet RJ45  1.32.0   
+Power Storage AC  TCP  Ethernet RJ45  1.32.0   
+RCT power 
+ 
+Power Storage DC  TCP  Ethernet RJ45  1.32.0  PV-Drosselung nur mit externem Stromzähler möglich 
+Beck 
+BESS  Modbus/TCP  Ethernet RJ45  1.32.0  Auf Anfrage 
+ 
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 5 
+
+ 
+ 
+Kostal  Plenticore Plus  Modbus/TCP  Ethernet RJ45  1.32.0  Auf Anfrage 
+BT  Modbus/TCP  Ethernet RJ45  1.32.0   
+Goodwe 
+ET  Modbus/TCP  Ethernet RJ45  1.32.0   
+MR 
+  Gridcon PCS  Modbus/TCP  Ethernet RJ45  1.32.0  Nur mit Tesvolt Speichersystemen 
+SH3.0RS / SH3.6RS / SH4.0RS /  Modbus/TCP,  Ethernet RJ45, 
+1.32.0   
+SH5.0RS / SH6.0RS  Modbus/RTU  RS485 
+SH5.0RT / SH6.0RT / SH8.0RT /  Modbus/TCP,  Ethernet RJ45, 
+1.32.0   
+sungrow   SH10RT  Modbus/RTU  RS485 
+SH8.0RS / SH10RS / SH5T-V11 / SH6T-
+V11 / SH8T-V11 / SH10T-V11 / SH12T- Modbus/TCP,  Ethernet RJ45, 
+>2.0.1   
+V11 / SH15T-V11 / SH20T-V11 /  Modbus/RTU  RS485 
+SH25T-V11 
+Ostermeier 
+Wasserstoffbatterie  Modbus/TCP  Ethernet RJ45  1.32.0  Auf Anfrage 
+ 
+ads-tec  
+StoraXe-System  Modbus/TCP  Ethernet RJ45  1.32.0  Auf Anfrage 
+Visblue 
+Redox-Flow-Batterie  Modbus/TCP  Ethernet RJ45  1.32.0   
+ENERTRONIC modular Storage  Modbus/TCP  Ethernet RJ45  1.32.0  USV-System 
+Benning  TRANSOTRONIC modular Storage  Modbus/TCP  Ethernet RJ45  1.32.0   
+Hoppecke  Modbus/TCP  Ethernet RJ45  2.0.0  Kompatible mit Fremdbatterie der Firma Hoppecke (Blei-Säure). 
+actrada   Industriespeicher 500 kW   Modbus/TCP  Ethernet RJ45  1.32.0   
+FoxESS  H3  Modbus/RTU  RS485  2.0.0  PV und Batterie kann nur lesend, aber nicht steuernd hinzugefügt werden. 
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 6 
+
+ 
+ 
+Home 5.8kWh (PRIMO-1-6-5-230)  Modbus/TCP  Ethernet RJ45  2.0.0  Externer Zähler ist erforderlich. Steuerung entweder eigenständig auf 
+SAX-Power 
+Netzanschlusszähler oder über AMPERIX®. Dann muss durch den SAX-
+Home 7.7kWh (PRIMO-1-8-5-230)  Modbus/TCP  Ethernet RJ45  2.0.0  Support die externe Steuerung freigeschaltet werden. 
+Modbus/TCP  RS485  3.0.0 
+ASW05kH-T2                                
+ASW06kH-T2                                
+ASW08kH-T2 
+ASW10kH-T2                                
+ASW12kH-T2                                
+ASW05kH-T2-O                                
+ASW06kH-T2-O                                
+ASW08kH-T2-O                                
+ 
+ASW10kH-T2-O                                
+solplanet 
+ASW12kH-T2-O                                
+ASW08kH-T3                                
+ASW10kH-T3                                
+ASW12kH-T3                                
+ASW08kH-T3-O                                
+ASW10kH-T3-O                                
+ASW12kH-T3-O 
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 7 
+
+ 
+ 
+3.  Ladestationen 
+ 
+Lade-  Zugangs-
+ Kommunikations-  Ladeart  Max. Lade-  Energiezähler 
+Hersteller  Modell  Protokoll/e  Firmware Punkte  kontrolle  Bemerkung 
+schnittstelle  Leistung je LP 
+(LP)  AC  DC  Ungeeicht  MID  ME  RFID  Key 
+Modbus/TCP, 
+P30 c-serie  Ethernet RJ45  1.32.0  1      22 kW  Opt.  Opt.  Opt.  Opt.     
+UDP  ✓
+Modbus/TCP, 
+Keba  P30 x-serie  Ethernet RJ45  1.32.0  1      22 kW  Opt.  Opt.  Opt.  Opt.     
+UDP  ✓
+Modbus/TCP, 
+Deutschland Edition  Ethernet RJ45  1.32.0  1      11 kW  Opt.  Opt.  Opt.  Opt.     
+UDP  ✓
+Modbus/TCP,  Ethernet RJ45, 
+Pro  1.32.0  1      22 kW            Externer Zähler empfohlen 
+Modbus/RTU  RS485  ✓ ✓ ✓ ✓
+wallbe 
+Modbus/TCP,  Ethernet RJ45, 
+Eco 2.0 22 kW  1.32.0  1      22 kW        Opt.     
+Modbus/RTU  RS485  ✓ ✓
+Amtron Xtra  Modbus/TCP  Ethernet RJ45  1.32.0  1      22 kW             
+✓ ✓ ✓ ✓
+Amtron Premium  Modbus/TCP  Ethernet RJ45  1.32.0  1      22 kW             
+✓ ✓ ✓ ✓
+Mennekes  Amtron 
+Modbus/TCP  Ethernet RJ45  1.32.0  1      22 kW             
+Professional(+) PnC  ✓ ✓ ✓
+Amtron Charge 
+Modbus/TCP  Ethernet RJ45  >2.0.0  1      11 kW AC             
+Control  ✓ ✓ ✓
+22 kW AC /  
+Benning  Belatron Modular T2  Modbus/TCP  Ethernet RJ45  >2.0.0  1-3                 
+✓ ✓ 30-480 kW DC  ✓ ✓
+Heidelberg  Energy Control  Modbus/RTU  RS485  1.32.0  1      11 kW        Opt.     
+✓ ✓
+Amperfied  connect.home  Modbus/TCP  Ethernet RJ45  1.32.0  1      11 kW             
+✓ ✓
+Lokales Energie-
+Modbus/TCP  Ethernet RJ45  1.32.0  40      22 kW            Auf Anfrage 
+management (LEM)  ✓
+Auf Anfrage und nur mit 
+Walther-Werke  ECOLECTRA  Modbus/TCP  Ethernet RJ45  1.32.0  2      22 kW            Modbus/TCP fähigem 
+✓ ✓ ✓
+Baseboard 
+basicEvo  Modbus/RTU  RS485  1.32.0  1      11 kW        Opt.  Opt.   
+✓
+smartEvo  Modbus/TCP  Ethernet RJ45  1.32.0  1      11 kW             
+✓ ✓ ✓
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 8 
+
+ 
+ 
+Duo WM/PM/BM 
+  Modbus/TCP  Ethernet RJ45  1.32.0  2      22 kW             
+(ehemals Advanced)  ✓ ✓ ✓
+Compleo 
+22 kW AC / 
+  CITO 500  Modbus/TCP  Ethernet RJ45  1.32.0  2                 
+✓ ✓ 50 kW DC  ✓ ✓
+Pracht  Alpha XT  Modbus/RTU  RS485  1.32.0  2  ✓    11 kW        Opt.     
+Nur steuerbar über externen 
+cPµ1  HTTP  Ethernet RJ45  1.32.0  1      13,8 kW           
+Hardy Barth  ✓ eCB1 Zähler 
+Interner eCB1 Zähler 
+Cph1  HTTP  Ethernet RJ45  1.32.0  1      22 kW           
+✓ ✓ ✓ ✓ vorhanden 
+Modbus/TCP,  Ethernet RJ45, 
+Webasto  Live  1.32.0  1      22 kW            Auf Anfrage 
+Modbus/RTU  RS485  ✓ ✓ ✓
+Eve Single Pro-Line  Modbus/TCP  Ethernet RJ45  1.32.0  1      22 kW            Auf Anfrage 
+✓ ✓ ✓
+Alfen 
+Eve Double Pro-Line  Modbus/TCP  Ethernet RJ45  1.32.0  2      22 kW            Auf Anfrage 
+✓ ✓ ✓
+Eve Double PG-Line  Modbus/TCP  Ethernet RJ45  1.32.0  2      22 kW            Auf Anfrage 
+✓ ✓ ✓
+HYC50  Modbus/TCP  Ethernet RJ45  1.32.0  2      50 kW             
+✓ ✓ ✓
+         Alpitronic   HYC150  Modbus/TCP  Ethernet RJ45  1.32.0  2  ⭘  ✓  150 kW    ✓    ✓    Optional mit AC-Interface 
+HYC200  Modbus/TCP  Ethernet RJ45  1.32.0  2      200 kW             
+✓ ✓ ✓
+HYC300  Modbus/TCP  Ethernet RJ45  1.32.0  2      300 kW            Optional mit AC-Interface 
+⭘ ✓ ✓ ✓
+HYC400  Modbus/TCP  Ethernet RJ45  1.32.0  2      400 kW             
+✓ ✓ ✓
+ABL  eM4  Modbus/TCP  Ethernet RJ45  1.32.0  2      22 kW             
+✓ ✓ ✓
+1   
+eSat r20  Modbus/TCP  Ethernet RJ45  2.0.0  ✓   11 kW             
+Hesotec  ✓ ✓
+electrify 
+1   
+eBox wr30  Modbus/TCP  Ethernet RJ45  2.0.0  ✓   22 kW             
+✓ ✓
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 9 
+
+ 
+ 
+1      11 kW           
+EVTAP-11k  Modbus/TCP  Ethernet RJ45  2.0.0  ✓ ✓ ✓  
+EVtap  1      22 kW           
+EVTAP-22k  Modbus/TCP  Ethernet RJ45  2.0.0  ✓ ✓ ✓  
+2      180 kW           
+EVTAP-180K-5M-2C  Modbus/TCP  Ethernet RJ45  2.0.0  ✓ ✓  
+ 
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 10 
+
+ 
+ 
+4.  Stromzähler 
+ 
+Phasen  Messart 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  1  3  Direkt (Imax)  Sekundärstrom (Imax)  Bemerkung 
+schnittstelle 
+mit separatem Wandler 
+Optischer Lese- vereinzelt PIN-einblinken 
+Basiszähler  SML  1.32.0         
+kopf per USB  ✓ ✓
+Hager 
+SML  Optischer Lese- vereinzelt PIN-einblinken 
+eHz  kopf per USB oder  1.32.0         
+✓ ✓
+OKK-BKE Gen. F 
+SML  Optischer Lese- vereinzelt PIN-einblinken 
+EMH  Basiszähler  kopf per USB  1.32.0  ✓  ✓     
+SML  Optischer Lese- vereinzelt PIN-einblinken 
+eHz  kopf per USB oder  1.32.0         
+✓ ✓
+OKK-BKE Gen. F 
+SML  Optischer Lese- vereinzelt PIN-einblinken 
+Basiszähler  1.32.0         
+kopf per USB  ✓ ✓
+Iskra 
+SML  Optischer Lese- vereinzelt PIN-einblinken 
+eHz  1.32.0         
+kopf per USB  ✓ ✓
+SML  Optischer Lese- vereinzelt PIN-einblinken 
+eBz  Basiszähler  1.32.0         
+kopf per USB  ✓ ✓
+     
+Impulszähler      1.32.0      Auf Anfrage 
+RS485 
+ET/EM 100 Serie  Modbus/RTU  1.32.0      65 A     
+✓
+Carlo Gavazzi 
+RS485 
+ET/EM 300 Serie  Modbus/RTU  1.32.0      65 A     
+✓ ✓
+Modbus/TCP,  Ethernet RJ45, 
+EM 24 Serie  1.32.0      65 A  5 A   
+Modbus/RTU  RS485  ✓ ✓
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 11 
+
+ 
+ 
+B21, B23 und B24  Modbus/RTU  RS485  1.32.0      65 A  5 A (nur B24)  B21 nur einphasig 
+✓ ✓
+Janitza 
+UMG 512, 604, 801, 806, 20 
+Modbus/RTU  RS485  1.32.0      65 A  5 A   
+CM und 96 RM-EL  ✓ ✓
+RS485 
+SDM220  Modbus/RTU  1.32.0      80 A     
+✓
+SDM630  RS485 
+Modbus/RTU  1.32.0           
+✓ ✓
+Eastron 
+SDM72DM V1  RS485 
+Modbus/RTU  1.32.0           
+✓ ✓
+SDM72DM V2  RS485 
+Modbus/RTU  1.32.0           
+✓ ✓
+TQ  EM 300  Modbus/TCP  Ethernet RJ45  1.32.0           
+✓ ✓
+ 
+Sentron PAC1665  Modbus/TCP  Ethernet RJ45  1.32.0         
+✓ ✓
+ 
+Sentron PAC2200  Modbus/TCP  Ethernet RJ45  1.32.0         
+✓ ✓
+Siemens 
+ 
+Sentron PAC3200  Modbus/TCP  Ethernet RJ45  1.32.0         
+✓ ✓
+ 
+Sentron PAC4200  Modbus/TCP  Ethernet RJ45  1.32.0         
+✓ ✓
+SMA 
+EnergyMeter  Speedwire  Ethernet RJ45  1.32.0      63 A  5 A   
+  ✓ ✓
+Schneider Electric     
+PM5300 Serie  Modbus/TCP  Ethernet RJ45  1.32.0       
+  ✓ ✓
+ 
+NZR  EcoCount S  Modbus/RTU  RS485  1.32.0      85 A  5 A   
+✓ ✓
+ 
+80 A   
+EEM-EM3XX  Modbus/RTU  RS485  1.32.0       
+Phoenix Contact  ✓ ✓
+  80 A   
+EEM-EM3XX  Modbus/TCP  Ethernet RJ45  1.32.0       
+✓ ✓
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 12 
+
+ 
+ 
+PQ Plus  Modbus/TCP,  Ethernet RJ45,     
+MMB 700  1.32.0       
+  Modbus/RTU  RS485  ✓ ✓
+Grid Control     
+eMeter  Modbus/RTU  RS485  1.32.0       
+Technologies  ✓ ✓
+    Per HTTP über eCB1 zusätzlich 
+anbindbar und auslesbar: B-
+Hardy Barth   eCB1  HTTP  Ethernet RJ45  1.32.0      control Energy Manager, KLEFR 
+✓ ✓ 6934 Energy Meter, RCT Power 
+Messpunkt, Tesla Powerwall 
+Messpunkt 
+EMU Electronic     
+Professional II  Modbus/TCP  Ethernet RJ45  1.32.0       
+✓ ✓
+Socomec     
+Diris A-40  Modbus/TCP  Ethernet RJ45  2.0.0       
+✓ ✓
+   
+ KDK Dornscheidt  Count 3  Modbus/RTU  RS485  2.0.0       
+✓
+ 
+ 
+5.  Wärme- und Kältezähler 
+ 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+Kamstrup  MULTICAL 603  Modbus/TCP  Ethernet RJ45  1.32.0   
+Ultramess 603  Modbus/TCP  Ethernet RJ45  1.32.0   
+WDV Molliné 
+Supercal 531  Modbus/TCP  Ethernet RJ45  1.32.0   
+ 
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 13 
+
+ 
+ 
+6.  Druckluft- und Gaszähler 
+ 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+Berg   Modbus/TCP,  Ethernet RJ45, 
+BMG 1020  1.32.0   
+Modbus/RTU  RS485 
+ 
+ 
+7.  Wärmepumpen 
+ 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+SG Ready  UDP  USB, 
+  Digitale Kontakte, 
+  1.32.0  Auf Anfrage 
+  Separate KMTronic 
+  Hardware 
+ 
+8.  Heizstäbe 
+ 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+AC THOR   Modbus/TCP  Ethernet RJ45  1.32.0   
+MYPV 
+AC THOR 9s  Modbus/TCP  Ethernet RJ45  1.32.0   
+ 
+AC ELWA-E  Modbus/TCP  Ethernet RJ45  1.32.0   
+ 
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 14 
+
+ 
+ 
+9.  Brennstoffzellen 
+ 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+SOLIDpower 
+  BlueGEN BG-15  Modbus/TCP  Ethernet RJ45  1.32.0   
+ 
+Ostermeier 
+Brennstoffzelle  Modbus/TCP  Ethernet RJ45  1.32.0  Auf Anfrage 
+10. BHKW 
+ 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+Es wird ein Anybus-Gateway und eine g-box benötigt, um mit dem BHKW kommunizieren 
+2G Energy AG  zu können. Bei Unterbrechung der Verbindung muss das BHKW manuell wieder in den 
+g-box 50plus  Modbus/TCP  Ethernet RJ45  1.32.0 
+  Modus der externen Steuerung versetzt werden, um die Leistung steuern zu können. 
+Ansonsten können die Messwerte nur gelesen werden. 
+ 
+11. Elektrolyseure 
+ 
+Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+Ostermeier 
+Elektrolyseure  Modbus/TCP  Ethernet RJ45  1.32.0  Auf Anfrage 
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 15 
+
+ 
+ 
+12.  Externe Vorgaben 
+Externe Vorgaben sind jene Signale, die im Rahmen einer Fernwirktechnik außerhalb der Anlage an das System geschickt werden. 
+12.1 Rundsteuerempfänger 
+Die Ausgänge des Rundsteuerempfängers eines örtlichen Verteilnetzbetreibers können an den AMPERIX® über digitale Kontakte angeschlossen werden. Dabei ist auf die 
+vom Netzbetreiber vorgesehene Verkabelung zu achten. Es können bis zu vier Kontakte verwendet werden. Die jeweiligen Leistungsgrenzen je Signalkombination können 
+nach Belieben konfiguriert werden. Verfügbar ab der Firmware 1.32.0. 
+12.2 Vermarkter Schnittstelle 
+Es wird eine Möglichkeit geboten externe Steuersignale über eine Vermarkter Schnittstelle eines Partners in das Energiemanagement Ihrer Anlage einfließen zu lassen, 
+um so Erzeugungsanlagen lukrativer betreiben zu können. Verfügbar ab der Firmware 2.0.0. 
+ 
+12.3 Dynamische Stromtarife 
+ 
+ Kommunikations- 
+Hersteller  Modell  Protokoll/e  Firmware  Bemerkung 
+schnittstelle 
+Monatlich  HTTP  Tibber API  2.0.0   
+Tibber 
+Stündlich  HTTP  Tibber API  2.0.0  Nur mit SMGW oder der zusätzlichen Hardware Pulse von Tibber 
+aWATTar  Stündlich  HTTP  aWATTar API  2.0.0   
+Stündlich  HTTP  EPEX-API  3.0.0  Preiszone Deutschland-Luxemburg 
+EPX SPOT 
+   
+© Wendeware AG   |   Kompatibilitätsliste   |   Stand 18.12.2024                                         Seite 16 
