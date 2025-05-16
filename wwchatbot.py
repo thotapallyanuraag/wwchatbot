@@ -1,11 +1,10 @@
 import streamlit as st
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA
-import os
+from langchain_openai import ChatOpenAI
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
 
 st.set_page_config(page_title="Wendeware Chatbot", layout="centered")
-st.title("🤖 Wendeware Hybrid Chatbot")
+st.title("🤖 Wendeware Hybrid Chatbot (No FAISS)")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -33,39 +32,27 @@ def rule_based_response(query):
         return "Wendeware AG is a German company focusing on energy automation."
     return None
 
-# --- LOAD FAISS INDEX ONLY (NO EMBEDDING) ---
+# --- LOAD TEXT CONTEXT ---
 @st.cache_resource
-def load_pdf_qa():
-    from langchain.schema import Document
-    from langchain_community.vectorstores import FAISS
-    from langchain_openai import OpenAIEmbeddings
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
-    import os
-
-    if os.path.exists("faiss_index/index.faiss"):
-        return FAISS.load_local("faiss_index", OpenAIEmbeddings(), allow_dangerous_deserialization=True, index_name="index")
-
-
-    # Only runs ONCE to build index
+def load_pdf_text():
     with open("compatibility_text.txt", "r", encoding="utf-8") as f:
-        text = f.read()
+        return f.read()
 
-    documents = [Document(page_content=text)]
-    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
-    docs = splitter.split_documents(documents)
+context_text = load_pdf_text()
 
-    vectordb = FAISS.from_documents(docs, OpenAIEmbeddings())
-    vectordb.save_local("faiss_index")
-    return vectordb
+# --- GPT CONTEXT Q&A ---
+llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+template = """
+You are an expert on Wendeware products. Use the following context to answer:
 
+Context:
+{context}
 
-
-# --- INIT QA CHAIN ---
-qa_chain = RetrievalQA.from_chain_type(
-    llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
-    chain_type="stuff",
-    retriever=load_pdf_qa().as_retriever()
-)
+Question:
+{question}
+"""
+prompt = PromptTemplate.from_template(template)
+qa_chain = LLMChain(llm=llm, prompt=prompt)
 
 # --- CHAT HANDLER ---
 user_input = st.chat_input("Ask anything about AMPERIX®, tariffs, or compatibility...")
@@ -76,8 +63,8 @@ if user_input:
 
     response = rule_based_response(user_input)
     if not response:
-        with st.spinner("Searching compatibility list..."):
-            response = qa_chain.run(user_input)
+        with st.spinner("Searching compatibility info..."):
+            response = qa_chain.run({"context": context_text, "question": user_input})
 
     st.session_state.messages.append({"role": "assistant", "content": response})
     st.chat_message("assistant").write(response)
