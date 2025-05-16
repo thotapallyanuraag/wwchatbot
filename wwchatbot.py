@@ -1,5 +1,5 @@
 import streamlit as st
-from langchain.document_loaders import PyMuPDFLoader
+from langchain.document_loaders import UnstructuredPDFLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -50,7 +50,7 @@ def rule_based_response(query):
 # --- LOAD PDF & INDEX ONCE ---
 @st.cache_resource
 def load_pdf_qa():
-    loader = PyMuPDFLoader("compatibility.pdf")
+    loader = UnstructuredPDFLoader("compatibility.pdf")
     pages = loader.load()
 
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
