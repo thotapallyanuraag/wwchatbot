@@ -40,7 +40,12 @@ def load_pdf_qa():
     from langchain_community.vectorstores import FAISS
     from langchain_openai import OpenAIEmbeddings
     from langchain.text_splitter import RecursiveCharacterTextSplitter
+    import os
 
+    if os.path.exists("faiss_index/index.faiss"):
+        return FAISS.load_local("faiss_index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+
+    # Only runs ONCE to build index
     with open("compatibility_text.txt", "r", encoding="utf-8") as f:
         text = f.read()
 
@@ -49,7 +54,9 @@ def load_pdf_qa():
     docs = splitter.split_documents(documents)
 
     vectordb = FAISS.from_documents(docs, OpenAIEmbeddings())
-    return vectordb.as_retriever()
+    vectordb.save_local("faiss_index")
+    return vectordb
+
 
 
 # --- INIT QA CHAIN ---
