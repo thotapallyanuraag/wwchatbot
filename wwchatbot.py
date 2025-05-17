@@ -113,32 +113,29 @@ headers = {
 }
 
 # -----------------------------
-# Chat Interface with Smart Context Selection
+# Chat Interface with Smart Context Selection & Quota Fallback
 # -----------------------------
 query = st.text_input("Ask me anything about WendeWare:")
 if query:
     with st.spinner("Generating response..."):
-        # Find pages where query appears in URL or content
+        # Find relevant pages
         q = query.lower()
         relevant = [u for u, txt in pages.items() if q in u.lower() or q in txt.lower()]
         if not relevant:
-            relevant = [URLS[0]]  # default to homepage
-        # limit to top 3 pages
+            relevant = [URLS[0]]
         relevant = relevant[:3]
 
-        # Build context only from relevant pages
         context = "\n\n".join(
             f"URL: {url}\nCONTENT:\n{pages[url][:1500]}"
             for url in relevant
         )
 
-        messages = [
-            {"role": "system", "content": "You are an expert assistant on WendeWare products. Use only the provided documentation."},
-            {"role": "user", "content": f"Documentation:\n{context}\n\nQuestion: {query}"}
-        ]
         payload = {
             "model": "gpt-3.5-turbo",
-            "messages": messages,
+            "messages": [
+                {"role": "system", "content": "You are an expert assistant on WendeWare products. Use only the provided documentation."},
+                {"role": "user", "content": f"Documentation:\n{context}\n\nQuestion: {query}"}
+            ],
             "temperature": 0.2,
             "max_tokens": 500
         }
@@ -147,10 +144,22 @@ if query:
             headers=headers,
             json=payload
         )
-        if resp.status_code != 200:
+        # Handle rate limit or other API errors
+        if resp.status_code == 429:
+            # Simple fallback: show first matching snippet
+            snippet = ""
+            for url, txt in pages.items():
+                idx = txt.lower().find(q)
+                if idx != -1:
+                    start = max(idx - 50, 0)
+                    snippet = txt[start:idx+len(query)+50]
+                    break
+            answer = snippet or "⚠️ Quota exceeded; please try your question later."
+        elif resp.status_code != 200:
             st.error(f"⚠️ API error {resp.status_code}: {resp.text[:200]}")
             st.stop()
-        answer = resp.json().get("choices", [])[0].get("message", {}).get("content", "No answer.")
+        else:
+            answer = resp.json().get("choices", [])[0].get("message", {}).get("content", "No answer.")
 
     st.markdown("**Answer:**")
     st.write(answer)
