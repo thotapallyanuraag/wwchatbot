@@ -113,16 +113,25 @@ headers = {
 }
 
 # -----------------------------
-# Chat Interface
+# Chat Interface with Smart Context Selection
 # -----------------------------
 query = st.text_input("Ask me anything about WendeWare:")
 if query:
     with st.spinner("Generating response..."):
-        # Build context from all pages (truncate each to avoid huge payload)
+        # Find pages where query appears in URL or content
+        q = query.lower()
+        relevant = [u for u, txt in pages.items() if q in u.lower() or q in txt.lower()]
+        if not relevant:
+            relevant = [URLS[0]]  # default to homepage
+        # limit to top 3 pages
+        relevant = relevant[:3]
+
+        # Build context only from relevant pages
         context = "\n\n".join(
-            f"URL: {url}\nCONTENT:\n{pages[url][:2000]}"
-            for url in pages
+            f"URL: {url}\nCONTENT:\n{pages[url][:1500]}"
+            for url in relevant
         )
+
         messages = [
             {"role": "system", "content": "You are an expert assistant on WendeWare products. Use only the provided documentation."},
             {"role": "user", "content": f"Documentation:\n{context}\n\nQuestion: {query}"}
@@ -138,12 +147,11 @@ if query:
             headers=headers,
             json=payload
         )
-        try:
-            resp.raise_for_status()
-            answer = resp.json()["choices"][0]["message"]["content"]
-        except Exception:
-            st.error("⚠️ Error fetching completion. Check your API key and rate limits.")
+        if resp.status_code != 200:
+            st.error(f"⚠️ API error {resp.status_code}: {resp.text[:200]}")
             st.stop()
+        answer = resp.json().get("choices", [])[0].get("message", {}).get("content", "No answer.")
+
     st.markdown("**Answer:**")
     st.write(answer)
 
