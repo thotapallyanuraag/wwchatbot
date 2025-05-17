@@ -1,7 +1,7 @@
 streamlit
 langchain==0.0.292
-faiss-cpu
 openai
 beautifulsoup4
 requests
+numpy
 protobuf<4.0
