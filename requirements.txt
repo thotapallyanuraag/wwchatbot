@@ -1,6 +1,6 @@
 streamlit
 langchain==0.0.292
-chromadb
+faiss-cpu
 openai
 beautifulsoup4
 requests
