@@ -50,9 +50,10 @@ import requests
 from bs4 import BeautifulSoup
 import streamlit as st
 import numpy as np
+import openai
 
+from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains import RetrievalQA
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import OpenAI
 
 # -----------------------------
@@ -89,24 +90,31 @@ def fetch_text(url: str) -> str:
         resp = requests.get(url, timeout=10)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
-        for tag in soup(["script", "style"]): tag.decompose()
+        for tag in soup(["script", "style"]):
+            tag.decompose()
         lines = [line.strip() for line in soup.get_text(separator="\n").splitlines() if line.strip()]
         return "\n".join(lines)
     except Exception:
         return ""
 
 # -----------------------------
-# Retriever
+# Retriever using OpenAI Embeddings
 # -----------------------------
 class SimpleRetriever:
-    def __init__(self, texts, embeddings, k=4):
+    def __init__(self, texts, api_key, k=4):
+        openai.api_key = api_key
         self.texts = texts
-        self.embeddings = embeddings
-        self.vectors = embeddings.embed_documents(texts)
         self.k = k
+        # build embeddings for each chunk
+        self.vectors = []
+        for chunk in texts:
+            resp = openai.Embedding.create(input=chunk, model=EMBEDDINGS_MODEL)
+            self.vectors.append(resp["data"][0]["embedding"])
 
     def get_relevant_documents(self, query):
-        qv = self.embeddings.embed_query(query)
+        resp = openai.Embedding.create(input=query, model=EMBEDDINGS_MODEL)
+        qv = resp["data"][0]["embedding"]
+        # cosine similarity
         sims = [np.dot(qv, dv) / (np.linalg.norm(qv) * np.linalg.norm(dv)) for dv in self.vectors]
         idxs = sorted(range(len(sims)), key=lambda i: sims[i], reverse=True)[: self.k]
         return [self.texts[i] for i in idxs]
@@ -123,19 +131,18 @@ if not API_KEY:
     st.error("🔑 Please add your OpenAI API key to Streamlit Secrets as OPENAI_API_KEY.")
     st.stop()
 
-# Initialize embeddings and LLM
-embeddings = OpenAIEmbeddings(model=EMBEDDINGS_MODEL, openai_api_key=API_KEY)
+# Initialize LLM
 llm = OpenAI(openai_api_key=API_KEY)
 
-# Build corpus
-with st.spinner("Fetching and embedding documents—please wait..."):
+# Load and split documents
+with st.spinner("Fetching and splitting documents—please wait..."):
     all_text = ""
     for url in URLS:
         st.write(f"Fetching {url}")
         all_text += fetch_text(url) + "\n"
-    splitter = __import__('langchain').text_splitter.CharacterTextSplitter(separator="\n", chunk_size=800, chunk_overlap=200)
+    splitter = CharacterTextSplitter(separator="\n", chunk_size=800, chunk_overlap=200)
     docs = splitter.split_text(all_text)
-    retriever = SimpleRetriever(docs, embeddings)
+    retriever = SimpleRetriever(docs, api_key=API_KEY)
 
 # Chat interface
 query = st.text_input("Ask me anything about WendeWare:")
@@ -145,3 +152,4 @@ if query:
         answer = chain.run(query)
     st.markdown("**Answer:**")
     st.write(answer)
+
