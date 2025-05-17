@@ -98,24 +98,28 @@ def fetch_text(url: str) -> str:
         return ""
 
 # -----------------------------
-# Retriever using OpenAI Embeddings
+# Retriever using bulk OpenAI Embeddings
 # -----------------------------
 class SimpleRetriever:
-    def __init__(self, texts, api_key, k: int = 4):
+    def __init__(self, texts: list[str], api_key: str, k: int = 4):
         openai.api_key = api_key
         self.texts = texts
         self.k = k
-        # Pre-compute embeddings for each chunk
-        self.vectors = []
-        for chunk in texts:
-            resp = openai.Embedding.create(input=chunk, model=EMBEDDINGS_MODEL)
-            self.vectors.append(resp["data"][0]["embedding"])
+        # Bulk-create embeddings for all chunks in one request
+        response = openai.Embedding.create(
+            input=texts,
+            model=EMBEDDINGS_MODEL
+        )
+        # Extract embeddings
+        self.vectors = [data["embedding"] for data in response["data"]]
 
-    def get_relevant_documents(self, query: str):
-        resp = openai.Embedding.create(input=query, model=EMBEDDINGS_MODEL)
+    def get_relevant_documents(self, query: str) -> list[str]:
+        # Embed the query
+        resp = openai.Embedding.create(input=[query], model=EMBEDDINGS_MODEL)
         qv = resp["data"][0]["embedding"]
-        # cosine similarity
+        # Compute cosine similarity
         sims = [np.dot(qv, dv) / (np.linalg.norm(qv) * np.linalg.norm(dv)) for dv in self.vectors]
+        # Return top-k docs
         idxs = sorted(range(len(sims)), key=lambda i: sims[i], reverse=True)[: self.k]
         return [self.texts[i] for i in idxs]
 
@@ -152,5 +156,6 @@ if query:
         answer = chain.run(query)
     st.markdown("**Answer:**")
     st.write(answer)
+
 
 
