@@ -49,18 +49,16 @@
 import requests
 from bs4 import BeautifulSoup
 import streamlit as st
+import numpy as np
 
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import OpenAI
 
 # -----------------------------
 # Configuration
 # -----------------------------
 EMBEDDINGS_MODEL = "text-embedding-ada-002"
-
 URLS = [
     "https://www.wendeware.com/",
     "https://www.wendeware.com/amperix-energiemanagementsystem",
@@ -85,37 +83,33 @@ URLS = [
 # -----------------------------
 def fetch_text(url: str) -> str:
     """
-    Fetches and cleans the text content of a web page.
+    Fetches and cleans text from a URL.
     """
     try:
         resp = requests.get(url, timeout=10)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
-        for tag in soup(["script", "style"]):
-            tag.decompose()
+        for tag in soup(["script", "style"]): tag.decompose()
         lines = [line.strip() for line in soup.get_text(separator="\n").splitlines() if line.strip()]
         return "\n".join(lines)
     except Exception:
         return ""
 
 # -----------------------------
-# Vector Store Initialization
+# Retriever
 # -----------------------------
-def get_vectorstore():
-    """
-    Builds an in-memory FAISS vector store from the provided URLs.
-    """
-    all_text = ""
-    for url in URLS:
-        st.write(f"Fetching {url}")
-        all_text += fetch_text(url) + "\n"
+class SimpleRetriever:
+    def __init__(self, texts, embeddings, k=4):
+        self.texts = texts
+        self.embeddings = embeddings
+        self.vectors = embeddings.embed_documents(texts)
+        self.k = k
 
-    splitter = CharacterTextSplitter(separator="\n", chunk_size=800, chunk_overlap=200)
-    docs = splitter.split_text(all_text)
-
-    embeddings = OpenAIEmbeddings(model=EMBEDDINGS_MODEL, openai_api_key=API_KEY)
-    store = FAISS.from_texts(texts=docs, embedding=embeddings)
-    return store
+    def get_relevant_documents(self, query):
+        qv = self.embeddings.embed_query(query)
+        sims = [np.dot(qv, dv) / (np.linalg.norm(qv) * np.linalg.norm(dv)) for dv in self.vectors]
+        idxs = sorted(range(len(sims)), key=lambda i: sims[i], reverse=True)[: self.k]
+        return [self.texts[i] for i in idxs]
 
 # -----------------------------
 # Streamlit App
@@ -123,23 +117,31 @@ def get_vectorstore():
 st.set_page_config(page_title="WendeWare Q&A Bot", layout="wide")
 st.title("WendeWare Interview Chatbot")
 
-# Retrieve OpenAI key from Streamlit secrets
+# Load API key from secrets
 API_KEY = st.secrets.get("OPENAI_API_KEY")
 if not API_KEY:
     st.error("🔑 Please add your OpenAI API key to Streamlit Secrets as OPENAI_API_KEY.")
     st.stop()
 
-# Build vector store and QA chain
-with st.spinner("Building knowledge base—this may take a minute..."):
-    vectorstore = get_vectorstore()
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
-    llm = OpenAI(openai_api_key=API_KEY)
-    qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever)
+# Initialize embeddings and LLM
+embeddings = OpenAIEmbeddings(model=EMBEDDINGS_MODEL, openai_api_key=API_KEY)
+llm = OpenAI(openai_api_key=API_KEY)
+
+# Build corpus
+with st.spinner("Fetching and embedding documents—please wait..."):
+    all_text = ""
+    for url in URLS:
+        st.write(f"Fetching {url}")
+        all_text += fetch_text(url) + "\n"
+    splitter = __import__('langchain').text_splitter.CharacterTextSplitter(separator="\n", chunk_size=800, chunk_overlap=200)
+    docs = splitter.split_text(all_text)
+    retriever = SimpleRetriever(docs, embeddings)
 
 # Chat interface
 query = st.text_input("Ask me anything about WendeWare:")
 if query:
     with st.spinner("Thinking..."):
-        answer = qa_chain.run(query)
+        chain = RetrievalQA(llm=llm, retriever=retriever)
+        answer = chain.run(query)
     st.markdown("**Answer:**")
     st.write(answer)
