@@ -4,3 +4,4 @@ chromadb
 openai
 beautifulsoup4
 requests
+protobuf<4.0
