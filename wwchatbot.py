@@ -105,14 +105,14 @@ class SimpleRetriever:
         openai.api_key = api_key
         self.texts = texts
         self.k = k
-        # Pre-compute embeddings for each chunk using the new v1 API
+        # Pre-compute embeddings for each chunk
         self.vectors = []
         for chunk in texts:
-            resp = openai.Embeddings.create(input=chunk, model=EMBEDDINGS_MODEL)
+            resp = openai.Embedding.create(input=chunk, model=EMBEDDINGS_MODEL)
             self.vectors.append(resp["data"][0]["embedding"])
 
     def get_relevant_documents(self, query: str):
-        resp = openai.Embeddings.create(input=query, model=EMBEDDINGS_MODEL)
+        resp = openai.Embedding.create(input=query, model=EMBEDDINGS_MODEL)
         qv = resp["data"][0]["embedding"]
         # cosine similarity
         sims = [np.dot(qv, dv) / (np.linalg.norm(qv) * np.linalg.norm(dv)) for dv in self.vectors]
@@ -152,4 +152,5 @@ if query:
         answer = chain.run(query)
     st.markdown("**Answer:**")
     st.write(answer)
+
 
