@@ -51,6 +51,7 @@ from bs4 import BeautifulSoup
 import streamlit as st
 import numpy as np
 import openai
+import time
 
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains import RetrievalQA
@@ -98,6 +99,24 @@ def fetch_text(url: str) -> str:
         return ""
 
 # -----------------------------
+# Retry helper for embeddings
+# -----------------------------
+def embed_with_backoff(inputs, model):
+    """
+    Call OpenAI embeddings API with retries on rate limit.
+    """
+    for attempt in range(3):
+        try:
+            return openai.Embedding.create(input=inputs, model=model)
+        except openai.error.RateLimitError:
+            if attempt < 2:
+                time.sleep(5 * (attempt + 1))
+            else:
+                st.error("⚠️ Rate limit exceeded. Please wait and try again later.")
+                st.stop()
+    return None
+
+# -----------------------------
 # Retriever using bulk OpenAI Embeddings
 # -----------------------------
 class SimpleRetriever:
@@ -105,17 +124,13 @@ class SimpleRetriever:
         openai.api_key = api_key
         self.texts = texts
         self.k = k
-        # Bulk-create embeddings for all chunks in one request
-        response = openai.Embedding.create(
-            input=texts,
-            model=EMBEDDINGS_MODEL
-        )
-        # Extract embeddings
+        # Bulk-create embeddings with retries
+        response = embed_with_backoff(self.texts, EMBEDDINGS_MODEL)
         self.vectors = [data["embedding"] for data in response["data"]]
 
     def get_relevant_documents(self, query: str) -> list[str]:
-        # Embed the query
-        resp = openai.Embedding.create(input=[query], model=EMBEDDINGS_MODEL)
+        # Embed the query with retry
+        resp = embed_with_backoff([query], EMBEDDINGS_MODEL)
         qv = resp["data"][0]["embedding"]
         # Compute cosine similarity
         sims = [np.dot(qv, dv) / (np.linalg.norm(qv) * np.linalg.norm(dv)) for dv in self.vectors]
