@@ -49,18 +49,11 @@
 import requests
 from bs4 import BeautifulSoup
 import streamlit as st
-import numpy as np
 import openai
-import time
-
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
 
 # -----------------------------
 # Configuration
 # -----------------------------
-EMBEDDINGS_MODEL = "text-embedding-ada-002"
 URLS = [
     "https://www.wendeware.com/",
     "https://www.wendeware.com/amperix-energiemanagementsystem",
@@ -83,92 +76,62 @@ URLS = [
 # -----------------------------
 # Helpers
 # -----------------------------
-def fetch_text(url: str) -> str:
-    """
-    Fetches and cleans text from a URL.
-    """
+def fetch_page(url: str) -> str:
     try:
-        resp = requests.get(url, timeout=10)
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
-        for tag in soup(["script", "style"]):
-            tag.decompose()
-        lines = [line.strip() for line in soup.get_text(separator="\n").splitlines() if line.strip()]
-        return "\n".join(lines)
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for t in soup(["script", "style"]): t.decompose()
+        text = "\n".join([ln.strip() for ln in soup.get_text(separator="\n").splitlines() if ln.strip()])
+        return text
     except Exception:
         return ""
 
 # -----------------------------
-# Retry helper for embeddings
+# Load pages once
 # -----------------------------
-def embed_with_backoff(inputs, model):
-    """
-    Call OpenAI embeddings API with retries on rate limit.
-    """
-    for attempt in range(3):
-        try:
-            return openai.Embedding.create(input=inputs, model=model)
-        except openai.error.RateLimitError:
-            if attempt < 2:
-                time.sleep(5 * (attempt + 1))
-            else:
-                st.error("⚠️ Rate limit exceeded. Please wait and try again later.")
-                st.stop()
-    return None
+@st.cache_data(show_spinner=False)
+def load_pages():
+    data = {}
+    for url in URLS:
+        data[url] = fetch_page(url)
+    return data
+
+pages = load_pages()
 
 # -----------------------------
-# Retriever using bulk OpenAI Embeddings
+# Streamlit UI
 # -----------------------------
-class SimpleRetriever:
-    def __init__(self, texts: list[str], api_key: str, k: int = 4):
-        openai.api_key = api_key
-        self.texts = texts
-        self.k = k
-        # Bulk-create embeddings with retries
-        response = embed_with_backoff(self.texts, EMBEDDINGS_MODEL)
-        self.vectors = [data["embedding"] for data in response["data"]]
-
-    def get_relevant_documents(self, query: str) -> list[str]:
-        # Embed the query with retry
-        resp = embed_with_backoff([query], EMBEDDINGS_MODEL)
-        qv = resp["data"][0]["embedding"]
-        # Compute cosine similarity
-        sims = [np.dot(qv, dv) / (np.linalg.norm(qv) * np.linalg.norm(dv)) for dv in self.vectors]
-        # Return top-k docs
-        idxs = sorted(range(len(sims)), key=lambda i: sims[i], reverse=True)[: self.k]
-        return [self.texts[i] for i in idxs]
-
-# -----------------------------
-# Streamlit App
-# -----------------------------
-st.set_page_config(page_title="WendeWare Q&A Bot", layout="wide")
+st.set_page_config(page_title="WendeWare Interview Chatbot", layout="wide")
 st.title("WendeWare Interview Chatbot")
 
-# Load API key from secrets
-API_KEY = st.secrets.get("OPENAI_API_KEY")
-if not API_KEY:
-    st.error("🔑 Please add your OpenAI API key to Streamlit Secrets as OPENAI_API_KEY.")
+# API Key
+openai_api_key = st.secrets.get("OPENAI_API_KEY")
+if not openai_api_key:
+    st.error("🔑 Please set OPENAI_API_KEY in Streamlit Secrets.")
     st.stop()
+openai.api_key = openai_api_key
 
-# Initialize LLM for answer generation
-llm = OpenAI(openai_api_key=API_KEY)
-
-# Build corpus and retriever
-with st.spinner("Fetching, embedding, and indexing WendeWare docs—please wait..."):
-    all_text = ""
-    for url in URLS:
-        st.write(f"Fetching {url}")
-        all_text += fetch_text(url) + "\n"
-    splitter = CharacterTextSplitter(separator="\n", chunk_size=800, chunk_overlap=200)
-    docs = splitter.split_text(all_text)
-    retriever = SimpleRetriever(docs, api_key=API_KEY)
-
-# Chat interface
+# User query
 query = st.text_input("Ask me anything about WendeWare:")
 if query:
-    with st.spinner("Thinking..."):
-        chain = RetrievalQA(llm=llm, retriever=retriever)
-        answer = chain.run(query)
+    with st.spinner("Generating response..."):
+        # Combine all page texts (or select relevant ones)
+        context = "\n\n".join(
+            f"URL: {u}\nCONTENT:\n{pages[u][:2000]}" for u in pages
+        )
+        # Build chat messages
+        messages = [
+            {"role": "system", "content": "You are a knowledgeable assistant about WendeWare products and services."},
+            {"role": "user", "content": f"Use the following documentation to answer the question. If the answer isn't contained here, say you don't know.\n\nDocumentation:\n{context}\n\nQuestion: {query}"}
+        ]
+        resp = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+            temperature=0.2,
+            max_tokens=500,
+        )
+        answer = resp.choices[0].message.content
     st.markdown("**Answer:**")
     st.write(answer)
 
