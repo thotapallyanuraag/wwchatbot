@@ -1,6 +1,6 @@
 streamlit
 langchain==0.0.292
-openai
+openai==0.27.8
 beautifulsoup4
 requests
 numpy
