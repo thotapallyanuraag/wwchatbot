@@ -50,19 +50,17 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from pathlib import Path
+import streamlit as st
 
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
-import streamlit as st
+from langchain.llms import OpenAI
 
 # -----------------------------
 # Configuration
 # -----------------------------
-# Make sure you have set your OpenAI API key in the environment:
-# export OPENAI_API_KEY="your_openai_api_key"
-
 EMBEDDINGS_MODEL = "text-embedding-ada-002"
 PERSIST_DIR = "./db"
 
@@ -90,21 +88,18 @@ URLS = [
 # -----------------------------
 def fetch_text(url: str) -> str:
     """
-    Fetches the text content of a URL by stripping tags.
+    Fetches and cleans the text content of a web page.
     """
     try:
         resp = requests.get(url, timeout=10)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
-        # Remove scripts/styles
         for tag in soup(["script", "style"]):
             tag.decompose()
-        text = soup.get_text(separator=" \n")
-        # Clean whitespace
-        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        lines = [line.strip() for line in soup.get_text(separator="\n").splitlines() if line.strip()]
         return "\n".join(lines)
     except Exception as e:
-        st.error(f"Error fetching {url}: {e}")
+        st.warning(f"Could not fetch {url}: {e}")
         return ""
 
 # -----------------------------
@@ -112,54 +107,45 @@ def fetch_text(url: str) -> str:
 # -----------------------------
 def get_vectorstore():
     """
-    Creates or loads a Chroma vector store from the given URLs.
+    Creates or loads a Chroma vector store from the provided URLs.
     """
     if not Path(PERSIST_DIR).exists():
-        # Scrape and prepare documents
         all_text = ""
         for url in URLS:
             st.write(f"Fetching {url}")
             all_text += fetch_text(url) + "\n"
 
-        splitter = CharacterTextSplitter(
-            separator="\n",
-            chunk_size=800,
-            chunk_overlap=200,
-        )
+        splitter = CharacterTextSplitter(separator="\n", chunk_size=800, chunk_overlap=200)
         docs = splitter.split_text(all_text)
 
-        embeddings = OpenAIEmbeddings(model=EMBEDDINGS_MODEL)
-        store = Chroma.from_texts(
-            texts=docs,
-            embedding=embeddings,
-            persist_directory=PERSIST_DIR,
-        )
+        embeddings = OpenAIEmbeddings(model=EMBEDDINGS_MODEL, openai_api_key=API_KEY)
+        store = Chroma.from_texts(texts=docs, embedding=embeddings, persist_directory=PERSIST_DIR)
         store.persist()
     else:
-        store = Chroma(
-            persist_directory=PERSIST_DIR,
-            embedding_function=OpenAIEmbeddings(model=EMBEDDINGS_MODEL),
-        )
+        store = Chroma(persist_directory=PERSIST_DIR, embedding_function=OpenAIEmbeddings(model=EMBEDDINGS_MODEL, openai_api_key=API_KEY))
     return store
 
 # -----------------------------
-# Streamlit UI
+# Streamlit App
 # -----------------------------
 st.set_page_config(page_title="WendeWare Q&A Bot", layout="wide")
 st.title("WendeWare Interview Chatbot")
 
-# Initialize vector store and retriever
+# Read API key from Streamlit secrets
+API_KEY = st.secrets.get("OPENAI_API_KEY")
+if not API_KEY:
+    st.error("🔑 Please add your OpenAI API key to Streamlit Secrets (OPENAI_API_KEY).")
+    st.stop()
+
+# Load or build vector store
 with st.spinner("Loading knowledge base..."):
     vectorstore = get_vectorstore()
     retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=OpenAIEmbeddings(model=EMBEDDINGS_MODEL),
-        chain_type="stuff",
-        retriever=retriever,
-    )
+    llm = OpenAI(openai_api_key=API_KEY)
+    qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever)
 
 # Chat interface
-query = st.text_input("Ask me anything about WendeWare:")
+query = st.text_input("Ask anything about WendeWare:")
 if query:
     with st.spinner("Thinking..."):
         answer = qa_chain.run(query)
