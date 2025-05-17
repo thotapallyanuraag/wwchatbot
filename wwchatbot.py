@@ -49,7 +49,6 @@
 import requests
 from bs4 import BeautifulSoup
 import streamlit as st
-import openai
 
 # -----------------------------
 # Configuration
@@ -74,66 +73,80 @@ URLS = [
 ]
 
 # -----------------------------
-# Helpers
-# -----------------------------
-def fetch_page(url: str) -> str:
-    try:
-        r = requests.get(url, timeout=10)
-        r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        for t in soup(["script", "style"]): t.decompose()
-        text = "\n".join([ln.strip() for ln in soup.get_text(separator="\n").splitlines() if ln.strip()])
-        return text
-    except Exception:
-        return ""
-
-# -----------------------------
-# Load pages once
+# Page Fetching & Caching
 # -----------------------------
 @st.cache_data(show_spinner=False)
 def load_pages():
     data = {}
     for url in URLS:
-        data[url] = fetch_page(url)
+        try:
+            resp = requests.get(url, timeout=10)
+            resp.raise_for_status()
+            soup = BeautifulSoup(resp.text, "html.parser")
+            for tag in soup(["script", "style"]):
+                tag.decompose()
+            text = "\n".join(
+                [line.strip() for line in soup.get_text(separator="\n").splitlines() if line.strip()]
+            )
+            data[url] = text
+        except Exception:
+            data[url] = ""
     return data
 
 pages = load_pages()
 
 # -----------------------------
-# Streamlit UI
+# Streamlit App Setup
 # -----------------------------
 st.set_page_config(page_title="WendeWare Interview Chatbot", layout="wide")
 st.title("WendeWare Interview Chatbot")
 
-# API Key
-openai_api_key = st.secrets.get("OPENAI_API_KEY")
-if not openai_api_key:
-    st.error("🔑 Please set OPENAI_API_KEY in Streamlit Secrets.")
+# Load API key from secrets
+api_key = st.secrets.get("OPENAI_API_KEY")
+if not api_key:
+    st.error("🔑 Please add your OpenAI API key to Streamlit Secrets (OPENAI_API_KEY).")
     st.stop()
-openai.api_key = openai_api_key
 
-# User query
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json"
+}
+
+# -----------------------------
+# Chat Interface
+# -----------------------------
 query = st.text_input("Ask me anything about WendeWare:")
 if query:
     with st.spinner("Generating response..."):
-        # Combine all page texts (or select relevant ones)
+        # Build context from all pages (truncate each to avoid huge payload)
         context = "\n\n".join(
-            f"URL: {u}\nCONTENT:\n{pages[u][:2000]}" for u in pages
+            f"URL: {url}\nCONTENT:\n{pages[url][:2000]}"
+            for url in pages
         )
-        # Build chat messages
         messages = [
-            {"role": "system", "content": "You are a knowledgeable assistant about WendeWare products and services."},
-            {"role": "user", "content": f"Use the following documentation to answer the question. If the answer isn't contained here, say you don't know.\n\nDocumentation:\n{context}\n\nQuestion: {query}"}
+            {"role": "system", "content": "You are an expert assistant on WendeWare products. Use only the provided documentation."},
+            {"role": "user", "content": f"Documentation:\n{context}\n\nQuestion: {query}"}
         ]
-        resp = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            temperature=0.2,
-            max_tokens=500,
+        payload = {
+            "model": "gpt-3.5-turbo",
+            "messages": messages,
+            "temperature": 0.2,
+            "max_tokens": 500
+        }
+        resp = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers=headers,
+            json=payload
         )
-        answer = resp.choices[0].message.content
+        try:
+            resp.raise_for_status()
+            answer = resp.json()["choices"][0]["message"]["content"]
+        except Exception:
+            st.error("⚠️ Error fetching completion. Check your API key and rate limits.")
+            st.stop()
     st.markdown("**Answer:**")
     st.write(answer)
+
 
 
 
