@@ -46,15 +46,13 @@
 #     st.chat_message(msg["role"]).write(msg["content"])
 
 
-import os
 import requests
 from bs4 import BeautifulSoup
-from pathlib import Path
 import streamlit as st
 
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
 
@@ -62,7 +60,6 @@ from langchain.llms import OpenAI
 # Configuration
 # -----------------------------
 EMBEDDINGS_MODEL = "text-embedding-ada-002"
-PERSIST_DIR = "./db"
 
 URLS = [
     "https://www.wendeware.com/",
@@ -98,31 +95,26 @@ def fetch_text(url: str) -> str:
             tag.decompose()
         lines = [line.strip() for line in soup.get_text(separator="\n").splitlines() if line.strip()]
         return "\n".join(lines)
-    except Exception as e:
-        st.warning(f"Could not fetch {url}: {e}")
+    except Exception:
         return ""
 
 # -----------------------------
-# Build or Load Vector Store
+# Vector Store Initialization
 # -----------------------------
 def get_vectorstore():
     """
-    Creates or loads a Chroma vector store from the provided URLs.
+    Builds an in-memory FAISS vector store from the provided URLs.
     """
-    if not Path(PERSIST_DIR).exists():
-        all_text = ""
-        for url in URLS:
-            st.write(f"Fetching {url}")
-            all_text += fetch_text(url) + "\n"
+    all_text = ""
+    for url in URLS:
+        st.write(f"Fetching {url}")
+        all_text += fetch_text(url) + "\n"
 
-        splitter = CharacterTextSplitter(separator="\n", chunk_size=800, chunk_overlap=200)
-        docs = splitter.split_text(all_text)
+    splitter = CharacterTextSplitter(separator="\n", chunk_size=800, chunk_overlap=200)
+    docs = splitter.split_text(all_text)
 
-        embeddings = OpenAIEmbeddings(model=EMBEDDINGS_MODEL, openai_api_key=API_KEY)
-        store = Chroma.from_texts(texts=docs, embedding=embeddings, persist_directory=PERSIST_DIR)
-        store.persist()
-    else:
-        store = Chroma(persist_directory=PERSIST_DIR, embedding_function=OpenAIEmbeddings(model=EMBEDDINGS_MODEL, openai_api_key=API_KEY))
+    embeddings = OpenAIEmbeddings(model=EMBEDDINGS_MODEL, openai_api_key=API_KEY)
+    store = FAISS.from_texts(texts=docs, embedding=embeddings)
     return store
 
 # -----------------------------
@@ -131,24 +123,23 @@ def get_vectorstore():
 st.set_page_config(page_title="WendeWare Q&A Bot", layout="wide")
 st.title("WendeWare Interview Chatbot")
 
-# Read API key from Streamlit secrets
+# Retrieve OpenAI key from Streamlit secrets
 API_KEY = st.secrets.get("OPENAI_API_KEY")
 if not API_KEY:
-    st.error("🔑 Please add your OpenAI API key to Streamlit Secrets (OPENAI_API_KEY).")
+    st.error("🔑 Please add your OpenAI API key to Streamlit Secrets as OPENAI_API_KEY.")
     st.stop()
 
-# Load or build vector store
-with st.spinner("Loading knowledge base..."):
+# Build vector store and QA chain
+with st.spinner("Building knowledge base—this may take a minute..."):
     vectorstore = get_vectorstore()
     retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
     llm = OpenAI(openai_api_key=API_KEY)
     qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever)
 
 # Chat interface
-query = st.text_input("Ask anything about WendeWare:")
+query = st.text_input("Ask me anything about WendeWare:")
 if query:
     with st.spinner("Thinking..."):
         answer = qa_chain.run(query)
     st.markdown("**Answer:**")
     st.write(answer)
-
