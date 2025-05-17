@@ -5,3 +5,4 @@ beautifulsoup4
 requests
 numpy
 protobuf<4.0
+tiktoken
