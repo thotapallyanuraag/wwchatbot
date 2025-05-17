@@ -101,18 +101,18 @@ def fetch_text(url: str) -> str:
 # Retriever using OpenAI Embeddings
 # -----------------------------
 class SimpleRetriever:
-    def __init__(self, texts, api_key, k=4):
+    def __init__(self, texts, api_key, k: int = 4):
         openai.api_key = api_key
         self.texts = texts
         self.k = k
-        # build embeddings for each chunk
+        # Pre-compute embeddings for each chunk using the new v1 API
         self.vectors = []
         for chunk in texts:
-            resp = openai.Embedding.create(input=chunk, model=EMBEDDINGS_MODEL)
+            resp = openai.Embeddings.create(input=chunk, model=EMBEDDINGS_MODEL)
             self.vectors.append(resp["data"][0]["embedding"])
 
-    def get_relevant_documents(self, query):
-        resp = openai.Embedding.create(input=query, model=EMBEDDINGS_MODEL)
+    def get_relevant_documents(self, query: str):
+        resp = openai.Embeddings.create(input=query, model=EMBEDDINGS_MODEL)
         qv = resp["data"][0]["embedding"]
         # cosine similarity
         sims = [np.dot(qv, dv) / (np.linalg.norm(qv) * np.linalg.norm(dv)) for dv in self.vectors]
@@ -131,11 +131,11 @@ if not API_KEY:
     st.error("🔑 Please add your OpenAI API key to Streamlit Secrets as OPENAI_API_KEY.")
     st.stop()
 
-# Initialize LLM
+# Initialize LLM for answer generation
 llm = OpenAI(openai_api_key=API_KEY)
 
-# Load and split documents
-with st.spinner("Fetching and splitting documents—please wait..."):
+# Build corpus and retriever
+with st.spinner("Fetching, embedding, and indexing WendeWare docs—please wait..."):
     all_text = ""
     for url in URLS:
         st.write(f"Fetching {url}")
